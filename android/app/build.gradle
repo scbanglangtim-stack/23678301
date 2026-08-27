@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.shopai"
+    namespace "com.campusmart_23678301"
     defaultConfig {
-        applicationId "com.shopai"
+        applicationId "com.campusmart_23678301"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

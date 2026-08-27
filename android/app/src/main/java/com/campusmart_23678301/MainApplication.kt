@@ -1,4 +1,4 @@
-package com.shopai
+package com.campusmart_23678301
 
 import android.app.Application
 import com.facebook.react.PackageList

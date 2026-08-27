@@ -6,7 +6,7 @@ import {
   TextInputProps,
   ViewStyle,
 } from 'react-native';
-import { Typography } from './Typography';
+import { Typography } from '@components/ui/Typography';
 import { useTheme } from '@contexts/ThemeContext';
 import { SIZES } from '@constants/theme';
 

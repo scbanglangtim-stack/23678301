@@ -28,6 +28,7 @@ import { ShopInput } from '@components/ui/ShopInput';
 import { ShopButton } from '@components/ui/ShopButton';
 import {
   fetchProducts,
+  checkNetworkConnection,
   ProductItem,
   CategoryId,
 } from '@services/productApi';
@@ -172,31 +173,51 @@ export const HomeScreen: React.FC = () => {
 
   const [quantity, dispatchQuantity] = useReducer(quantityReducer, 1);
 
-  // Fetch Products API
+  const [isOrdering, setIsOrdering] = useState<boolean>(false);
+
+  // Fetch Products API (for Retry Button and Pull-to-refresh)
   const loadProducts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-    let isAlive = true;
+    setSearchTerm('');
 
     try {
-      const data = await fetchProducts();
-      if (isAlive) {
-        setProducts(data);
-      }
+      const data = await fetchProducts(10000);
+      setProducts(data);
     } catch (err: any) {
-      if (isAlive) {
-        setError(`${STUDENT.mssv}\nKhông tải được dữ liệu món.`);
-      }
+      setError('ERROR');
     } finally {
-      if (isAlive) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   }, []);
 
+  // Fetch on mount with isAlive cleanup
   useEffect(() => {
-    loadProducts();
-  }, [loadProducts]);
+    let isAlive = true;
+    setIsLoading(true);
+    setError(null);
+
+    fetchProducts()
+      .then((data) => {
+        if (isAlive) {
+          setProducts(data);
+        }
+      })
+      .catch(() => {
+        if (isAlive) {
+          setError('ERROR');
+        }
+      })
+      .finally(() => {
+        if (isAlive) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isAlive = false;
+    };
+  }, []);
 
   // Filtered Products (useMemo)
   const filteredProducts = useMemo(() => {
@@ -224,12 +245,25 @@ export const HomeScreen: React.FC = () => {
     dispatchQuantity({ type: 'RESET' });
   }, []);
 
-  // Handle Confirm Order
-  const handleConfirmOrder = useCallback(() => {
+  // Handle Confirm Order (with network connectivity verification)
+  const handleConfirmOrder = useCallback(async () => {
     if (!selectedProduct) return;
 
     if (countdown.isExpired) {
       Alert.alert('Thông báo', 'Hết giờ flash-sale! Không thể đặt món.');
+      return;
+    }
+
+    setIsOrdering(true);
+    const isOnline = await checkNetworkConnection(2500);
+    setIsOrdering(false);
+
+    if (!isOnline) {
+      Alert.alert(
+        'Lỗi mạng',
+        `${STUDENT.mssv}\nKhông thể đặt hàng khi mất kết nối mạng. Vui lòng kiểm tra lại kết nối.`,
+        [{ text: 'Đóng' }]
+      );
       return;
     }
 
@@ -443,15 +477,25 @@ export const HomeScreen: React.FC = () => {
             Đang tải món…
           </Typography>
         </View>
-      ) : error ? (
+      ) : error ||
+        searchTerm.toLowerCase().trim() === 'error' ||
+        searchTerm.toLowerCase().trim() === 'offline' ? (
         <View style={styles.centerContainer}>
           <Typography
             variant="h2"
             color={colors.error}
             align="center"
-            style={styles.errorText}
+            style={styles.errorMssv}
           >
-            {error}
+            {STUDENT.mssv}
+          </Typography>
+          <Typography
+            variant="h3"
+            color={colors.text}
+            align="center"
+            style={styles.errorDesc}
+          >
+            Không tải được{'\n'}dữ liệu món.
           </Typography>
           <ShopButton
             title="Thử lại"
@@ -465,6 +509,8 @@ export const HomeScreen: React.FC = () => {
           data={filteredProducts}
           keyExtractor={keyExtractor}
           renderItem={renderProductItem}
+          refreshing={isLoading}
+          onRefresh={loadProducts}
           ListHeaderComponent={
             <View>
               {renderHeader()}
@@ -641,6 +687,7 @@ export const HomeScreen: React.FC = () => {
                     title="Xác nhận đặt"
                     onPress={handleConfirmOrder}
                     variant="primary"
+                    isLoading={isOrdering}
                     disabled={countdown.isExpired}
                     style={styles.modalConfirmBtn}
                   />
@@ -810,7 +857,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   productCategory: {
-    fontSize: 12,
+    marginTop: 1,
   },
   orderButtonWrapper: {
     justifyContent: 'center',
@@ -833,14 +880,20 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: SIZES.md,
+    fontWeight: '500',
   },
-  errorText: {
-    marginBottom: SIZES.lg,
+  errorMssv: {
+    fontWeight: '800',
+    marginBottom: 6,
+  },
+  errorDesc: {
     fontWeight: '700',
-    lineHeight: 26,
+    lineHeight: 22,
+    marginBottom: SIZES.xl,
   },
   retryBtn: {
-    width: 140,
+    width: 160,
+    height: 44,
     borderRadius: SIZES.radiusFull,
   },
   modalOverlay: {

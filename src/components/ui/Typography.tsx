@@ -7,12 +7,21 @@ export interface TypographyProps extends TextProps {
   variant?: FontVariant;
   color?: string;
   align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
+  numberOfLines?: number;
   style?: TextStyle | TextStyle[];
   children: React.ReactNode;
 }
 
 export const Typography: React.FC<TypographyProps> = React.memo(
-  ({ variant = 'body', color, align, style, children, ...rest }) => {
+  ({
+    variant = 'body',
+    color,
+    align,
+    numberOfLines,
+    style,
+    children,
+    ...rest
+  }) => {
     const { colors } = useTheme();
 
     const textStyle: TextStyle = {
@@ -22,7 +31,11 @@ export const Typography: React.FC<TypographyProps> = React.memo(
     };
 
     return (
-      <Text style={[textStyle, style]} {...rest}>
+      <Text
+        style={[styles.baseText, textStyle, style]}
+        numberOfLines={numberOfLines}
+        {...rest}
+      >
         {children}
       </Text>
     );
@@ -30,3 +43,9 @@ export const Typography: React.FC<TypographyProps> = React.memo(
 );
 
 Typography.displayName = 'Typography';
+
+const styles = StyleSheet.create({
+  baseText: {
+    includeFontPadding: false,
+  },
+});
