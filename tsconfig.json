@@ -9,7 +9,13 @@
       "@hooks/*": ["src/hooks/*"],
       "@services/*": ["src/services/*"],
       "@components/*": ["src/components/*"],
-      "@screens/*": ["src/screens/*"]
+      "@screens/*": ["src/screens/*"],
+      "@constants": ["src/constants/index", "src/constants/student", "src/constants/theme"],
+      "@contexts": ["src/contexts/ThemeContext"],
+      "@hooks": ["src/hooks/useCountdown"],
+      "@services": ["src/services/productApi"],
+      "@components": ["src/components/ui/Typography", "src/components/ui/ShopInput", "src/components/ui/ShopButton"],
+      "@screens": ["src/screens/HomeScreen"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

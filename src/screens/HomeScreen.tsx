@@ -88,6 +88,14 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ item, onSelect }) 
     onSelect(item);
   }, [item, onSelect]);
 
+  // Dynamic image background based on category
+  const imgBg =
+    item.category === 'drink'
+      ? '#E0F2FE'
+      : item.category === 'study'
+      ? '#F3F4F6'
+      : '#FEF3C7';
+
   return (
     <Pressable
       onPress={handlePress}
@@ -100,20 +108,17 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ item, onSelect }) 
         },
       ]}
     >
-      <Image
-        source={{ uri: item.image }}
-        style={styles.productImage}
-        resizeMode="contain"
-      />
+      <View style={[styles.productImageWrapper, { backgroundColor: imgBg }]}>
+        <Image
+          source={{ uri: item.image }}
+          style={styles.productImage}
+          resizeMode="contain"
+        />
+      </View>
       <View style={styles.productInfo}>
-        <View style={styles.categoryBadge}>
-          <Typography variant="captionBold" color={colors.primary}>
-            {item.categoryName}
-          </Typography>
-        </View>
         <Typography
           variant="h3"
-          numberOfLines={2}
+          numberOfLines={1}
           color={colors.text}
           style={styles.productTitle}
         >
@@ -125,6 +130,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ item, onSelect }) 
           style={styles.productPrice}
         >
           {item.formattedPrice}
+        </Typography>
+        <Typography
+          variant="caption"
+          color={colors.textLight}
+          style={styles.productCategory}
+        >
+          {item.categoryName}
         </Typography>
       </View>
       <View style={styles.orderButtonWrapper}>
@@ -173,7 +185,7 @@ export const HomeScreen: React.FC = () => {
       }
     } catch (err: any) {
       if (isAlive) {
-        setError(`${STUDENT.mssv} — Không tải được dữ liệu món.`);
+        setError(`${STUDENT.mssv}\nKhông tải được dữ liệu món.`);
       }
     } finally {
       if (isAlive) {
@@ -256,69 +268,54 @@ export const HomeScreen: React.FC = () => {
     </View>
   );
 
-  // Render Header (0) & (A)
+  // Render Header Block (A) - Solid Teal Banner matching Hình 1
   const renderHeader = () => (
-    <View style={styles.headerContainer}>
+    <View style={[styles.headerBanner, { backgroundColor: colors.primary }]}>
       <View style={styles.headerTopRow}>
         <View>
-          <Typography variant="h1" color={colors.primary} style={styles.brandTitle}>
+          <Typography variant="h1" color="#FFFFFF" style={styles.brandTitle}>
             CAMPUSMART
           </Typography>
-          <Typography variant="caption" color={colors.textLight}>
-            Cửa hàng tiện lợi KTX 24/7
+          <Typography variant="caption" color="#CCFBF1">
+            Tiện lợi KTX
           </Typography>
         </View>
 
-        <View style={styles.headerControls}>
+        <View style={styles.headerRightCol}>
           {VARIANT.themeControl === 'switch' ? (
             <View style={styles.switchWrapper}>
-              <Typography variant="captionBold" color={colors.text}>
+              <Typography variant="captionBold" color="#FFFFFF">
                 {isDarkMode ? 'Tối' : 'Sáng'}
               </Typography>
               <Switch
                 value={isDarkMode}
                 onValueChange={toggleTheme}
-                trackColor={{ false: '#CCFBF1', true: colors.primary }}
-                thumbColor={isDarkMode ? '#FFFFFF' : colors.primary}
+                trackColor={{ false: '#CCFBF1', true: '#042F2E' }}
+                thumbColor={isDarkMode ? '#FFFFFF' : '#F0FDFA'}
               />
             </View>
           ) : (
             <Pressable
               onPress={toggleTheme}
               style={[
-                styles.themeBtn,
+                styles.themePillBtn,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
+                  borderColor: '#FFFFFF',
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
                 },
               ]}
             >
-              <Typography variant="captionBold" color={colors.primary}>
-                {isDarkMode ? '☀️ Sáng' : '🌙 Tối'}
+              <Typography variant="captionBold" color="#FFFFFF">
+                {isDarkMode ? '🌙 Tối' : 'Sáng / Tối'}
               </Typography>
             </Pressable>
           )}
-        </View>
-      </View>
 
-      {/* Flash Sale Countdown */}
-      <View
-        style={[
-          styles.flashBadge,
-          {
-            backgroundColor: isDarkMode ? '#134E4A' : '#FEF3C7',
-            borderColor: colors.secondary,
-          },
-        ]}
-      >
-        <Typography variant="captionBold" color={colors.secondary}>
-          ⚡ Flash: {countdown.formattedTime}
-        </Typography>
-        {countdown.isExpired ? (
-          <Typography variant="captionBold" color={colors.error}>
-            {' '}(Hết giờ)
+          <Typography variant="captionBold" color={colors.secondary} style={styles.flashText}>
+            Flash {countdown.formattedTime}
+            {countdown.isExpired ? ' (Hết giờ)' : ''}
           </Typography>
-        ) : null}
+        </View>
       </View>
     </View>
   );
@@ -329,25 +326,27 @@ export const HomeScreen: React.FC = () => {
       <ShopInput
         value={searchTerm}
         onChangeText={setSearchTerm}
-        placeholder={`Tìm món nhanh (${STUDENT.mssv})...`}
+        placeholder={`Tìm món, nước, đồ dùng — ${STUDENT.mssv}`}
+        style={styles.searchInputCustom}
+        containerStyle={styles.searchInputWrapper}
       />
     </View>
   );
 
   // Render Banner (C)
   const renderBanner = () => (
-    <View style={[styles.bannerContainer, { borderColor: colors.border }]}>
+    <View style={[styles.bannerCard, { backgroundColor: isDarkMode ? '#0B4F4A' : '#0F766E' }]}>
       {bannerError ? (
-        <View style={[styles.bannerFallback, { backgroundColor: colors.surface }]}>
-          <Typography variant="h3" color={colors.primary}>
-            CampusMart KTX
-          </Typography>
-          <Typography variant="caption" color={colors.textLight}>
+        <View style={styles.bannerContent}>
+          <Typography variant="h2" color="#FFFFFF" style={styles.bannerMainTitle}>
             Đặt nhanh · Nhận tại quầy
+          </Typography>
+          <Typography variant="caption" color="#CCFBF1">
+            Cửa hàng tiện lợi ký túc xá 24/7
           </Typography>
         </View>
       ) : (
-        <>
+        <View style={styles.bannerImageContainer}>
           <Image
             source={{ uri: BANNER_URL }}
             style={styles.bannerImage}
@@ -355,21 +354,21 @@ export const HomeScreen: React.FC = () => {
             onError={() => setBannerError(true)}
           />
           <View style={styles.bannerOverlay}>
-            <Typography variant="h2" color="#FFFFFF" style={styles.bannerTitle}>
+            <Typography variant="h2" color="#FFFFFF" align="center" style={styles.bannerMainTitle}>
               Đặt nhanh · Nhận tại quầy
             </Typography>
-            <Typography variant="caption" color="#FFFFFF">
-              Tiện lợi · Nhanh chóng · 24/7 KTX
+            <Typography variant="caption" color="#CCFBF1" align="center">
+              Cửa hàng tiện lợi ký túc xá 24/7
             </Typography>
           </View>
-        </>
+        </View>
       )}
     </View>
   );
 
   // Render Category Chips (D)
   const renderChips = () => (
-    <View style={styles.chipsContainer}>
+    <View style={styles.chipsRow}>
       {ORDERED_CHIPS.map((chip) => {
         const isSelected = selectedCategory === chip.id;
         return (
@@ -377,16 +376,16 @@ export const HomeScreen: React.FC = () => {
             key={chip.id}
             onPress={() => setSelectedCategory(chip.id)}
             style={[
-              styles.chip,
+              styles.chipPill,
               {
                 backgroundColor: isSelected ? colors.primary : colors.surface,
-                borderColor: isSelected ? colors.primary : colors.border,
+                borderColor: colors.primary,
               },
             ]}
           >
             <Typography
               variant="captionBold"
-              color={isSelected ? '#FFFFFF' : colors.text}
+              color={isSelected ? '#FFFFFF' : colors.primary}
             >
               {chip.label}
             </Typography>
@@ -427,6 +426,7 @@ export const HomeScreen: React.FC = () => {
           backgroundColor: colors.background,
         },
       ]}
+      edges={['top', 'left', 'right', 'bottom']}
     >
       {/* Watermark at Top if VARIANT.watermarkAtTop is true */}
       {VARIANT.watermarkAtTop ? renderWatermark() : null}
@@ -446,7 +446,7 @@ export const HomeScreen: React.FC = () => {
       ) : error ? (
         <View style={styles.centerContainer}>
           <Typography
-            variant="h3"
+            variant="h2"
             color={colors.error}
             align="center"
             style={styles.errorText}
@@ -456,7 +456,7 @@ export const HomeScreen: React.FC = () => {
           <ShopButton
             title="Thử lại"
             onPress={loadProducts}
-            variant="primary"
+            variant="danger"
             style={styles.retryBtn}
           />
         </View>
@@ -468,9 +468,11 @@ export const HomeScreen: React.FC = () => {
           ListHeaderComponent={
             <View>
               {renderHeader()}
-              {renderSearch()}
-              {renderBanner()}
-              {renderChips()}
+              <View style={styles.mainPadding}>
+                {renderSearch()}
+                {renderBanner()}
+                {renderChips()}
+              </View>
             </View>
           }
           ListEmptyComponent={renderEmptyList}
@@ -479,10 +481,10 @@ export const HomeScreen: React.FC = () => {
         />
       )}
 
-      {/* Watermark at Bottom if VARIANT.watermarkAtTop is false */}
+      {/* Watermark at Bottom if VARIANT.watermarkAtTop is false (Odd Last Digit) */}
       {!VARIANT.watermarkAtTop ? renderWatermark() : null}
 
-      {/* Order Modal (Câu 3a) */}
+      {/* Order Modal (Câu 3a - Giao diện 2) */}
       <Modal
         visible={modalVisible}
         transparent={true}
@@ -499,13 +501,12 @@ export const HomeScreen: React.FC = () => {
               },
             ]}
           >
-            {/* Modal Watermark */}
+            {/* Modal Top Watermark Bar */}
             <View
               style={[
-                styles.modalWatermark,
+                styles.modalWatermarkBar,
                 {
                   backgroundColor: isDarkMode ? '#0B4F4A' : '#CCFBF1',
-                  borderColor: colors.border,
                 },
               ]}
             >
@@ -519,20 +520,29 @@ export const HomeScreen: React.FC = () => {
             </View>
 
             {selectedProduct ? (
-              <>
-                {/* Product Image & Info */}
-                <Image
-                  source={{ uri: selectedProduct.image }}
-                  style={styles.modalImage}
-                  resizeMode="contain"
-                />
-
-                <View style={styles.modalCategoryBadge}>
-                  <Typography variant="captionBold" color={colors.primary}>
-                    {selectedProduct.categoryName}
-                  </Typography>
+              <View style={styles.modalBody}>
+                {/* Product Image Box */}
+                <View
+                  style={[
+                    styles.modalImageBox,
+                    {
+                      backgroundColor:
+                        selectedProduct.category === 'drink'
+                          ? '#E0F2FE'
+                          : selectedProduct.category === 'study'
+                          ? '#F3F4F6'
+                          : '#FEF3C7',
+                    },
+                  ]}
+                >
+                  <Image
+                    source={{ uri: selectedProduct.image }}
+                    style={styles.modalImage}
+                    resizeMode="contain"
+                  />
                 </View>
 
+                {/* Product Name */}
                 <Typography
                   variant="h2"
                   color={colors.text}
@@ -542,6 +552,7 @@ export const HomeScreen: React.FC = () => {
                   {selectedProduct.title}
                 </Typography>
 
+                {/* Price */}
                 <Typography
                   variant="h2"
                   color={colors.primary}
@@ -551,6 +562,17 @@ export const HomeScreen: React.FC = () => {
                   {selectedProduct.formattedPrice}
                 </Typography>
 
+                {/* Category Label */}
+                <Typography
+                  variant="caption"
+                  color={colors.textLight}
+                  align="center"
+                  style={styles.modalCategory}
+                >
+                  Danh mục: {selectedProduct.categoryName}
+                </Typography>
+
+                {/* Description (max 2 lines) */}
                 <Typography
                   variant="caption"
                   numberOfLines={2}
@@ -558,30 +580,30 @@ export const HomeScreen: React.FC = () => {
                   align="center"
                   style={styles.modalDesc}
                 >
-                  {selectedProduct.description}
+                  {selectedProduct.description || 'Mô tả ngắn, tối đa 2 dòng...'}
                 </Typography>
 
                 {/* Quantity Controls (useReducer) */}
-                <View style={styles.quantityContainer}>
+                <View style={styles.quantityRow}>
                   <Pressable
                     onPress={() => dispatchQuantity({ type: 'REMOVE' })}
                     style={[
-                      styles.qtyBtn,
+                      styles.qtyBtnMinus,
                       {
-                        backgroundColor: colors.background,
-                        borderColor: colors.border,
+                        borderColor: colors.primary,
+                        backgroundColor: colors.surface,
                       },
                     ]}
                   >
-                    <Typography variant="h2" color={colors.primary}>
+                    <Typography variant="h3" color={colors.primary}>
                       −
                     </Typography>
                   </Pressable>
 
                   <Typography
-                    variant="h2"
+                    variant="h3"
                     color={colors.text}
-                    style={styles.qtyText}
+                    style={styles.qtyNumber}
                   >
                     {quantity}
                   </Typography>
@@ -589,20 +611,19 @@ export const HomeScreen: React.FC = () => {
                   <Pressable
                     onPress={() => dispatchQuantity({ type: 'ADD' })}
                     style={[
-                      styles.qtyBtn,
+                      styles.qtyBtnPlus,
                       {
-                        backgroundColor: colors.background,
-                        borderColor: colors.border,
+                        backgroundColor: colors.primary,
                       },
                     ]}
                   >
-                    <Typography variant="h2" color={colors.primary}>
+                    <Typography variant="h3" color="#FFFFFF">
                       +
                     </Typography>
                   </Pressable>
                 </View>
 
-                {/* Flash Expiration Warning */}
+                {/* Flash Expiration Notice */}
                 {countdown.isExpired ? (
                   <Typography
                     variant="captionBold"
@@ -621,17 +642,17 @@ export const HomeScreen: React.FC = () => {
                     onPress={handleConfirmOrder}
                     variant="primary"
                     disabled={countdown.isExpired}
-                    style={styles.modalBtn}
+                    style={styles.modalConfirmBtn}
                   />
 
                   <ShopButton
                     title="Đóng"
                     onPress={handleCloseModal}
                     variant="outline"
-                    style={styles.modalBtn}
+                    style={styles.modalCloseBtn}
                   />
                 </View>
-              </>
+              </View>
             ) : null}
           </View>
         </View>
@@ -645,18 +666,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   watermarkContainer: {
-    paddingVertical: SIZES.xs + 2,
+    paddingVertical: 8,
     paddingHorizontal: SIZES.md,
     borderBottomWidth: 1,
     borderTopWidth: 1,
   },
   listContent: {
-    paddingHorizontal: SIZES.md,
     paddingBottom: SIZES.xxl,
   },
-  headerContainer: {
-    paddingTop: SIZES.sm,
-    paddingBottom: SIZES.sm,
+  mainPadding: {
+    paddingHorizontal: SIZES.md,
+  },
+  headerBanner: {
+    paddingHorizontal: SIZES.md,
+    paddingTop: SIZES.md,
+    paddingBottom: SIZES.md,
   },
   headerTopRow: {
     flexDirection: 'row',
@@ -664,42 +688,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   brandTitle: {
-    letterSpacing: 1,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
-  headerControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  headerRightCol: {
+    alignItems: 'flex-end',
+    gap: 4,
   },
   switchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SIZES.xs,
   },
-  themeBtn: {
+  themePillBtn: {
     paddingHorizontal: SIZES.md,
-    paddingVertical: SIZES.xs + 2,
-    borderRadius: SIZES.radiusSm,
-    borderWidth: 1,
-  },
-  flashBadge: {
-    marginTop: SIZES.sm,
-    alignSelf: 'flex-start',
-    paddingHorizontal: SIZES.md,
-    paddingVertical: SIZES.xs,
+    paddingVertical: 4,
     borderRadius: SIZES.radiusFull,
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    borderWidth: 1.5,
+  },
+  flashText: {
+    marginTop: 2,
   },
   searchContainer: {
-    marginVertical: SIZES.sm,
+    marginTop: SIZES.md,
+    marginBottom: SIZES.sm,
   },
-  bannerContainer: {
-    height: 130,
-    borderRadius: SIZES.radiusMd,
+  searchInputWrapper: {
+    width: '100%',
+  },
+  searchInputCustom: {
+    height: 42,
+  },
+  bannerCard: {
+    height: 125,
+    borderRadius: SIZES.radiusLg,
     overflow: 'hidden',
-    borderWidth: 1,
     marginBottom: SIZES.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bannerImageContainer: {
+    width: '100%',
+    height: '100%',
     position: 'relative',
   },
   bannerImage: {
@@ -708,32 +738,34 @@ const styles = StyleSheet.create({
   },
   bannerOverlay: {
     position: 'absolute',
-    bottom: 0,
+    top: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(15, 118, 110, 0.85)',
+    bottom: 0,
+    backgroundColor: 'rgba(15, 118, 110, 0.78)',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: SIZES.md,
-    paddingVertical: SIZES.sm,
   },
-  bannerTitle: {
-    fontWeight: '700',
-  },
-  bannerFallback: {
-    flex: 1,
+  bannerContent: {
     justifyContent: 'center',
     alignItems: 'center',
     padding: SIZES.md,
   },
-  chipsContainer: {
+  bannerMainTitle: {
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  chipsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: SIZES.md,
-    gap: SIZES.xs,
+    gap: 6,
   },
-  chip: {
+  chipPill: {
     flex: 1,
-    paddingVertical: SIZES.sm,
-    borderRadius: SIZES.radiusSm,
+    paddingVertical: 8,
+    borderRadius: SIZES.radiusFull,
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -741,38 +773,53 @@ const styles = StyleSheet.create({
   productCard: {
     flexDirection: 'row',
     padding: SIZES.md,
-    borderRadius: SIZES.radiusMd,
-    borderWidth: 1.5,
+    borderRadius: SIZES.radiusLg,
+    borderWidth: 1,
+    marginHorizontal: SIZES.md,
     marginBottom: SIZES.md,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  productImageWrapper: {
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 6,
   },
   productImage: {
-    width: 68,
-    height: 68,
-    borderRadius: SIZES.radiusSm,
+    width: '100%',
+    height: '100%',
   },
   productInfo: {
     flex: 1,
     marginLeft: SIZES.md,
     marginRight: SIZES.sm,
   },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    marginBottom: SIZES.xs,
-  },
   productTitle: {
-    marginBottom: SIZES.xs,
+    fontWeight: '700',
+    marginBottom: 2,
   },
   productPrice: {
     fontWeight: '700',
+    marginBottom: 2,
+  },
+  productCategory: {
+    fontSize: 12,
   },
   orderButtonWrapper: {
     justifyContent: 'center',
   },
   smallOrderBtn: {
-    height: 36,
-    paddingHorizontal: SIZES.md,
-    borderRadius: SIZES.radiusSm,
+    height: 34,
+    width: 68,
+    paddingHorizontal: 0,
+    borderRadius: 10,
   },
   emptyContainer: {
     paddingVertical: SIZES.xxl,
@@ -788,66 +835,90 @@ const styles = StyleSheet.create({
     marginTop: SIZES.md,
   },
   errorText: {
-    marginBottom: SIZES.md,
+    marginBottom: SIZES.lg,
+    fontWeight: '700',
+    lineHeight: 26,
   },
   retryBtn: {
     width: 140,
+    borderRadius: SIZES.radiusFull,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: SIZES.lg,
   },
   modalBox: {
     width: '100%',
-    borderRadius: SIZES.radiusLg,
+    maxWidth: 340,
+    borderRadius: 24,
     borderWidth: 1.5,
+    overflow: 'hidden',
+  },
+  modalWatermarkBar: {
+    paddingVertical: 8,
+    paddingHorizontal: SIZES.sm,
+    width: '100%',
+  },
+  modalBody: {
     padding: SIZES.lg,
     alignItems: 'center',
   },
-  modalWatermark: {
-    width: '100%',
-    paddingVertical: SIZES.xs + 2,
-    borderRadius: SIZES.radiusSm,
-    borderWidth: 1,
+  modalImageBox: {
+    width: 140,
+    height: 110,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SIZES.sm,
     marginBottom: SIZES.md,
   },
   modalImage: {
-    width: 110,
-    height: 110,
-    marginBottom: SIZES.sm,
-  },
-  modalCategoryBadge: {
-    marginBottom: SIZES.xs,
+    width: '100%',
+    height: '100%',
   },
   modalTitle: {
-    marginBottom: SIZES.xs,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   modalPrice: {
-    marginBottom: SIZES.sm,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  modalCategory: {
+    marginBottom: 6,
   },
   modalDesc: {
     marginBottom: SIZES.md,
     paddingHorizontal: SIZES.sm,
+    lineHeight: 18,
   },
-  quantityContainer: {
+  quantityRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SIZES.md,
-    gap: SIZES.lg,
+    gap: SIZES.md,
   },
-  qtyBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: SIZES.radiusSm,
+  qtyBtnMinus: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
     borderWidth: 1.5,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  qtyText: {
-    minWidth: 32,
+  qtyBtnPlus: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  qtyNumber: {
+    fontWeight: '700',
+    minWidth: 28,
     textAlign: 'center',
   },
   expiredNotice: {
@@ -857,7 +928,14 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: SIZES.sm,
   },
-  modalBtn: {
+  modalConfirmBtn: {
     width: '100%',
+    height: 42,
+    borderRadius: 12,
+  },
+  modalCloseBtn: {
+    width: '100%',
+    height: 42,
+    borderRadius: 12,
   },
 });

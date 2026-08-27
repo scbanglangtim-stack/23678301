@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ViewStyle,
   TextStyle,
+  StyleProp,
 } from 'react-native';
 import { Typography } from './Typography';
 import { useTheme } from '@contexts/ThemeContext';
@@ -13,11 +14,11 @@ import { SIZES } from '@constants/theme';
 export interface ShopButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'outline';
+  variant?: 'primary' | 'outline' | 'danger';
   isLoading?: boolean;
   disabled?: boolean;
-  style?: ViewStyle | ViewStyle[];
-  textStyle?: TextStyle;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
 }
 
 export const ShopButton: React.FC<ShopButtonProps> = React.memo(
@@ -31,17 +32,29 @@ export const ShopButton: React.FC<ShopButtonProps> = React.memo(
     textStyle,
   }) => {
     const { colors } = useTheme();
-    const isPrimary = variant === 'primary';
     const isDisabled = disabled || isLoading;
 
-    const buttonBackground = isPrimary
-      ? isDisabled
-        ? colors.textLight
-        : colors.primary
-      : 'transparent';
+    let buttonBackground = colors.primary;
+    let borderColor = colors.primary;
+    let textColor = '#FFFFFF';
+    let borderWidth = 0;
 
-    const borderColor = isPrimary ? 'transparent' : colors.primary;
-    const textColor = isPrimary ? '#FFFFFF' : colors.primary;
+    if (variant === 'outline') {
+      buttonBackground = colors.surface;
+      borderColor = colors.primary;
+      borderWidth = 1.5;
+      textColor = colors.primary;
+    } else if (variant === 'danger') {
+      buttonBackground = colors.error;
+      borderColor = colors.error;
+      borderWidth = 0;
+      textColor = '#FFFFFF';
+    } else {
+      buttonBackground = isDisabled ? colors.textLight : colors.primary;
+      borderColor = buttonBackground;
+      borderWidth = 0;
+      textColor = '#FFFFFF';
+    }
 
     return (
       <TouchableOpacity
@@ -53,7 +66,7 @@ export const ShopButton: React.FC<ShopButtonProps> = React.memo(
           {
             backgroundColor: buttonBackground,
             borderColor: borderColor,
-            borderWidth: isPrimary ? 0 : 1.5,
+            borderWidth: borderWidth,
             opacity: isDisabled && !isLoading ? 0.6 : 1,
           },
           style,
@@ -62,14 +75,14 @@ export const ShopButton: React.FC<ShopButtonProps> = React.memo(
         {isLoading ? (
           <ActivityIndicator
             size="small"
-            color={isPrimary ? '#FFFFFF' : colors.primary}
+            color={variant === 'outline' ? colors.primary : '#FFFFFF'}
           />
         ) : (
           <Typography
             variant="button"
             color={textColor}
             align="center"
-            style={textStyle}
+            style={styles.btnText}
           >
             {title}
           </Typography>
@@ -83,11 +96,14 @@ ShopButton.displayName = 'ShopButton';
 
 const styles = StyleSheet.create({
   button: {
-    height: 42,
-    borderRadius: SIZES.radiusMd,
+    height: 40,
+    borderRadius: 12,
     paddingHorizontal: SIZES.lg,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
+  },
+  btnText: {
+    fontWeight: '700',
   },
 });
