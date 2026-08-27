@@ -18,7 +18,7 @@
 - **Nút chuyển Sáng/Tối**: `Pressable` ("Sáng / Tối" dạng pill)
 - **Kiểu mở Modal**: `fade` (`modalAnimation: 'fade'`)
 - **Thứ tự 4 Chip**: `Học tập` → `Nước` → `Đồ ăn` → `Tất cả` (Thứ tự đảo)
-- **Link GitHub nộp bài (clone HTTPS)**: `https://github.com/nguyenphat/23678301.git`
+- **Link GitHub nộp bài (clone HTTPS)**: `https://github.com/scbanglangtim-stack/23678301.git`
 
 ---
 

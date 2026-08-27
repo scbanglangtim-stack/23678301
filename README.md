@@ -1,4 +1,4 @@
-# NGUYEN HUYNH TAN PHAT - 23678301 - https://github.com/nguyenphat/23678301.git - #355913
+# NGUYEN HUYNH TAN PHAT - 23678301 - https://github.com/scbanglangtim-stack/23678301.git - #355913
 
 ## BÀI THI THỰC HÀNH 1 - LẬP TRÌNH CHO THIẾT BỊ DI ĐỘNG (TH)
 **Trường Đại học Công nghiệp TP. Hồ Chí Minh - Khoa CN Điện tử**
@@ -10,7 +10,7 @@
 - **STUDENT_SEED**: 301
 - **Mã Stamp**: `#355913`
 - **Dòng định danh App**: `TH1 · 23678301 · NGUYEN HUYNH TAN PHAT · #355913`
-- **Link GitHub nộp bài (clone HTTPS)**: `https://github.com/nguyenphat/23678301.git`
+- **Link GitHub nộp bài (clone HTTPS)**: `https://github.com/scbanglangtim-stack/23678301.git`
 
 ### 2. Thông số và Biến thể theo MSSV (Số cuối = 1)
 - **Vị trí Watermark**: Dưới chân màn hình (`watermarkAtTop: false`)
